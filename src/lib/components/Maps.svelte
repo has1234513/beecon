@@ -1,60 +1,68 @@
 <script>
-// @ts-nocheck
+	// @ts-nocheck
+	import { onMount } from 'svelte';
+	import 'maplibre-gl/dist/maplibre-gl.css';
+	import { Loader } from '@googlemaps/js-api-loader';
 
-  import { onMount } from 'svelte';
-  let map;
-  let marker;
-  let mapElement;
+	const api_key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-  // Replace with your own Google Maps API key
-  const apiKey = 'My_Api_key';
+	let map; // Declare the map variable
 
-  // Replace with the initial coordinates of the GPS device
-  const initialPosition = { lat: -34.397, lng: 150.644 };
+	onMount(() => {
+		console.log('api key', api_key);
+		const loader = new Loader({
+			apiKey: api_key,
+			version: 'weekly'
+		});
 
-  onMount(async () => {
-    // Load the Google Maps JavaScript API script
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
-    script.async = true;
-    document.head.appendChild(script);
+		loader.load().then(async () => {
+			const { Map } = await google.maps.importLibrary('maps');
 
-    // Wait for the Google Maps JavaScript API script to load
-    await new Promise(resolve => {
-      script.onload = resolve;
-    });
+			map = new Map(document.getElementById('map-container'), {
+				// Corrected ID
+				center: { lat: -34.08, lng: 18.54 },
+				zoom: 8
+			});
 
-    // Create the map
-    map = new google.maps.Map(mapElement, {
-      center: initialPosition,
-      zoom: 8,
-    });
+			// Get the location from your server or other source
+			const deviceLocation = { lat: -34.078238963294666, lng: 18.550834410232856 };
 
-    // Create the marker
-    marker = new google.maps.Marker({
-      position: initialPosition,
-      map,
-    });
+			// Create a marker at that location
+			const marker = new google.maps.Marker({
+				position: deviceLocation,
+				map: map,
+				title: 'My Device',
+				icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png' // Optional: custom icon
+			});
 
-    // Update the marker position in real-time as new GPS data becomes available
-    // Replace this with your own code to get the GPS data
-    setInterval(() => {
-      const newPosition = getNewPositionFromGPS();
-      marker.setPosition(newPosition);
-      map.panTo(newPosition);
-    }, 1000);
-  });
+			// Optionally, set the map's center to the device's location
+			map.setCenter(deviceLocation);
+		});
+	});
 </script>
 
-<svelte:head>
-  <style>
-    #map {
-      height: 400px;
-      width: 600px
-    }
-  </style>
-</svelte:head>
+<div class="map-wrap">
+	<div id="map-container"><!-- Corrected ID --></div>
+</div>
 
-<h1>Maps is supposed to be here</h1>
+<style>
+	.map-wrap {
+		position: relative;
+		width: 100%;
+		height: calc(80vh - 77px); /* calculate height of the screen minus the heading */
+	}
 
-<div id="map" bind:this={mapElement}></div>
+	#map-container {
+		/* Updated CSS selector */
+		position: absolute;
+		width: 100%;
+		height: 100%;
+	}
+
+	.watermark {
+		position: absolute;
+		left: 10px;
+		bottom: 10px;
+		z-index: 999;
+	}
+</style>

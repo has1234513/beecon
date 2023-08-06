@@ -1,15 +1,11 @@
 <script>
-// @ts-nocheck
+	// @ts-nocheck
 
 	import Map from '../../lib/components/Maps.svelte';
 </script>
 
-
 <div>
-  <h1>Map</h1>
+	<h1>Map</h1>
 
-
-  <Map/>
-
+	<Map />
 </div>
-
