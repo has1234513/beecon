@@ -8,8 +8,8 @@
 
 	let map; // Declare the map variable
 
+
 	onMount(() => {
-		console.log('api key', api_key);
 		const loader = new Loader({
 			apiKey: api_key,
 			version: 'weekly'
